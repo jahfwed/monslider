@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Advanced Slider</title>
+
+<link rel="stylesheet" type="text/css" href="css/style.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="css/advanced-slider-base.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="css/pixel/pixel.css" media="screen"/>
+
+<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+<script type="text/javascript" src="js/jquery.advancedSlider.js"></script>
+<!--[if IE]><script type="text/javascript" src="js/excanvas.compiled.js"></script><![endif]-->
+
+<script type="text/javascript">
+
+	var slider;
+		
+	$(document).ready(function(){
+		slider = $('.slider').advancedSlider({width:750, height:345, pauseSlideshowOnHover:true, initialEffect:false,
+											  slideProperties:{
+												  0:{effectType:'scale', horizontalSlices:'6', verticalSlices:'3', sliceDuration:'1000'},
+												  1:{effectType:'fade', horizontalSlices:'1', verticalSlices:'1', slicePattern:'leftToRight', captionPosition:'custom',
+													 captionShowEffect:'fade', captionHeight:160, slideshowDelay:12000},
+												  2:{effectType:'slide', horizontalSlices:'10', verticalSlices:'1', slicePattern:'rightToLeft', sliceDuration:'700'},
+												  3:{effectType:'height', horizontalSlices:'10', verticalSlices:'1', slicePattern:'leftToRight', slicePoint:'centerBottom',
+													 sliceDuration:'500', captionSize:'40'},
+												  4:{effectType:'scale', horizontalSlices:'10', verticalSlices:'5', sliceDuration:'800'},
+												  5:{effectType:'height', horizontalSlices:'1', verticalSlices:'15', slicePattern:'bottomToTop', slicePoint:'centerTop',
+													 sliceDuration:'700', captionPosition:'left', captionSize:'150', captionHideEffect:'slide'},
+												  6:{effectType:'slide', horizontalSlices:'6', verticalSlices:'3', slicePattern:'topLeftToBottomRight', 
+													 slideStartPosition:'rightBottom', slideStartRatio:'0.5', sliceDuration:'700'},
+												  7:{effectType:'fade', horizontalSlices:'10', verticalSlices:'5'},
+												  8:{effectType:'slide', horizontalSlices:'15', verticalSlices:'1', slideMask:'true', slicePattern:'rightToLeft', 
+													 slideStartPosition:'verticalAlternative', sliceDuration:'800'},
+												  9:{effectType:'fade', horizontalSlices:'10', verticalSlices:'5'}
+											   }
+											   });
+	});
+	
+</script>
+
+</head>
+
+<body>
+	
+    <div class="slider">
+    	<div class="slider-item">
+    		<img src="http://bqworks.com/products/advanced-slider/images/image1.jpg"/>
+    		<img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image1.jpg"/>
+			<div class="caption">This is just a simple caption.</div>
+      	</div>
+        
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image2.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image2.jpg"/>
+			<div class="caption"><b><i>Custom size and position</i></b> <br/><br/> You can set the caption's position to left, right, top or bottom, but you can also give it a custom position and size, as you can see in this example. Also, you can choose from 2 caption effects: slide and fade.</div>
+      	</div>
+        
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image3.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image3.jpg"/>
+      	</div>
+        
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image4.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image4.jpg"/>
+			<div class="caption">You can also add <b>HTML</b> elements like <a href="http://codecanyon.net">links</a> or <input type="button" value="Buttons"/></div>
+      	</div>
+        
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image5.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image5.jpg"/>
+      	</div>
+    
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image6.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image6.jpg"/>
+			<div class="caption"><u>Title</u><br/><br/>This is a list of items:<ul><li>first item</li><li>second item</li><li>third item</li></ul></div>
+      	</div>
+    
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image7.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image7.jpg"/>
+      	</div>
+    
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image8.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image8.jpg"/>
+      	</div>
+        
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image9.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image9.jpg"/>
+      	</div>
+    
+        <div class="slider-item">
+            <img src="http://bqworks.com/products/advanced-slider/images/image10.jpg"/>
+            <img class="thumbnail" src="http://bqworks.com/products/advanced-slider/thumbnails/image10.jpg"/>
+        </div>
+    </div>
+    
+</body>
+
+</html>
