@@ -28,8 +28,9 @@ class monslider extends Module{
 		|| !$this->installModuleTab('AdminSlider', array(1=>'My Slider Tab', 2=>'Mon onglet Slider'), 2)
 		//Suppression des dossiers images et thumbnails
 		|| !mkdir('../modules/monslider/images')//if not exist??
-        || !mkdir('../modules/monslider/thumbs')
-        || !mkdir('../modules/monslider/crop')
+		|| !chmod('../modules/monslider/images',0777)
+        //|| !mkdir('../modules/monslider/thumbs')
+        //|| !mkdir('../modules/monslider/crop')
         /*Appel de la fonction de création de la table :*/
         || !$this->createTable()
         )
@@ -43,40 +44,62 @@ class monslider extends Module{
 	    || !Configuration::deleteByName('MOD_SLIDER_IMG')
 	    || !$this->uninstallModuleTab('AdminSlider')
 		//Suppression des dossiers images et thumbnails
-		|| !Tools::deleteDirectory('../modules/monslider/images')
-        || !Tools::deleteDirectory('../modules/monslider/thumbs')
-        || !Tools::deleteDirectory('../modules/monslider/crop')
+		//|| !Tools::deleteDirectory('../modules/monslider/images/')
+        || !$this->deleteFiles('../modules/monslider/images/')
+		//|| !unlink('../modules/monslider/images')
+        //|| !unlink('../modules/monslider/thumbs')
+        //|| !unlink('../modules/monslider/crop')
         //Suppression de la table :
-		|| !Db::delete('ps_slider')
+		//|| !$this->deleteTable()
         )
 	    return false;
 	  return true;
 	}
+    
+    //marche pas...à voir!
+    public function deleteFiles($folder){
+            
+        $dossier=opendir($folder);
+        
+        while ($fichier = readdir($dossier))
+        {
+            if ($fichier != "." && $fichier != "..")
+            {
+                $Vidage= $folder.$fichier;
+                @unlink($Vidage);
+            }
+        }
+        closedir($dossier);
+    }
 	
-/*	
-	public function getContent()
-	{
+	public function getContent() {
 	  $html = '';
 	  if(Tools::isSubmit('submitSlider'))
 	  {
-	    if(Validate::isUrl(Tools::getValue('slider_img')))
+	    if(Validate::isInt(Tools::getValue('cropW') && Validate::isInt(Tools::getValue('cropW'))))
 	    {
-	      Configuration::updateValue('MOD_SLIDER_IMG', Tools::getValue('slider_img'));
-	      $html .= $this->displayConfirmation($this->l('Settings updated.'));
+    	    Configuration::updateValue('cropW', Tools::getValue('newCropW'));
+            Configuration::updateValue('cropH', Tools::getValue('newCropH'));    
+              
+          
+            $html .= $this->displayConfirmation($this->l('Settings updated.'));
 	    }
 	    else
 	    {
-	      $html .= $this->displayError($this->l('Invalid URL.'));
+	      $html .= $this->displayError($this->l('Invalid Value.'));
 	    }
 	  }
-	  $slider_img = Configuration::get('MOD_SLIDER_IMG');
-	  $html .= '<h2>'.$this->l('Slider Module').'</h2>
+	  $cropW = Configuration::get('cropW');
+      $cropH = Configuration::get('cropH');
+	  $html .= '<h2>'.$this->l('Slider Module Configuration').'</h2>
 	  <form action="'.$_SERVER['REQUEST_URI'].'" method="post">
 	    <fieldset>
 	      <legend>'.$this->l('Settings').'</legend>
-	      <label>'.$this->l('Image URL').'</label>
 	      <div class="margin-form">
-	        <input type="text" name="slider_img" value="'.$slider_img.'" />
+            <label for="cropW">Choose Width :</label>	      
+	        <input type="text" name="newCropW" value="'.$cropW.'" /><br />
+	        <label for="cropH">Choose Height :</label>
+	        <input type="text" name="newCropH" value="'.$cropH.'" />
 	      </div>
 	      <div class="clear center">
 	        <p>&nbsp;</p>
@@ -86,7 +109,6 @@ class monslider extends Module{
 	  </form>';
 	  return $html;
 	}
-*/
 	
 	public function hookHome($params)
     {

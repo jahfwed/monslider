@@ -35,8 +35,17 @@ class AdminSlider extends AdminTab
         $smarty->assign('imageHeight', $result['size_y']);
         $smarty->assign('extension', $result['extension']);
         
+        //Configuration::updateValue('cropW', Tools::getValue(500));
+        //Configuration::updateValue('cropH', Tools::getValue(350));
+        
+        $smarty->assign('cropW', 500);
+        $smarty->assign('cropH', 350);
+        
+        //$monslider->deleteFiles('../modules/monslider/images/');
+        
         $monslider->crop();
-
+        
+        
         return $smarty->display(dirname(__FILE__). '\AdminSlider.tpl');
         
         

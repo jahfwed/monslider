@@ -8,8 +8,8 @@ window.onload = function() {
     var imgW = document.getElementById('imageWidth').value;
     var imgH = document.getElementById('imageHeight').value;
     
-    var cropW = 500;
-    var cropH = 350;
+    var cropW = {/literal}{$cropW}{literal};
+    var cropH = {/literal}{$cropH}{literal};
     
     var paper = new Raphael(document.getElementById('divPhoto'), imgW, imgH);
         
