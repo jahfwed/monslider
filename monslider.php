@@ -24,6 +24,7 @@ class monslider extends Module{
 	    || !$this->registerHook('home')
         || !$this->registerHook('header')
         || !$this->registerHook('footer')
+	    || !$this->registerHook('backOfficeHeader')
 	    || !Configuration::updateValue('MOD_SLIDER_IMG', _PS_MODULE_DIR_.'monslider/logo_admin.png')
 		|| !$this->installModuleTab('AdminSlider', array(1=>'My Slider Tab', 2=>'Mon onglet Slider'), 2)
 		//Suppression des dossiers images et thumbnails
@@ -140,7 +141,10 @@ class monslider extends Module{
         
         return $this->display(__FILE__, 'footer.tpl');
     }
-    
+    public function hookBackOfficeHeader($params)
+    {
+        echo "<link type='text/css' href='../modules/monslider/css/ui-darkness/jquery-ui-1.8.18.custom.css' rel='stylesheet' />";
+    }
     
     private function installModuleTab($tabClass, $tabName, $idTabParent)
     {
@@ -360,12 +364,6 @@ class monslider extends Module{
                 imagecopyresampled($thumb,$source,0,0,0,0,$thumb_x,$thumb_y_final,$source_x,$source_y);
                 
                 imagejpeg($thumb,THUMB_PATH . $fichierFinal);
-                                
-                
-                echo "<div class='divCropFinal'>";
-                echo "<img src='";
-                echo "../modules/monslider/crop/" . $fichierFinal;
-                echo " ' />";
                 }
                 
                 
@@ -375,29 +373,10 @@ class monslider extends Module{
    
 
     public function afficheImage(){
-        //Boucle d'affichage (changer 'if' en 'while')
-        $sql = "SELECT `id`,`extension` FROM `ps_slider`";
-        
-        if($row = Db::getInstance()->getRow($sql)){
-            $id = $row['id'];
-            $extension = $row['extension'];    
-                
-            $img = $id .'.'. $extension;
-            
-            echo "<div id='divImage'>";
-            echo "<img src='";
-            echo "../modules/monslider/images/" . $img;
-            echo " ' />";
-            
-            echo "<img src='";
-            echo "../modules/monslider/thumbs/" . $img;
-            echo " ' />";
-            
-            echo "</div>";
-            echo '<br />';
-            echo '<br />';                
-        }
-        
+        $result = Db::getInstance()->ExecuteS('SELECT id, extension, titre FROM `ps_slider` ORDER BY id DESC');
+        if (!$result) 
+            return false;
+        return $result;   
     }
      
 	

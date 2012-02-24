@@ -44,7 +44,8 @@ class AdminSlider extends AdminTab
         //$monslider->deleteFiles('../modules/monslider/images/');
         
         $monslider->crop();
-        
+        $retour = $monslider->afficheImage();
+        $smarty->assign('imgList', $retour);
         
         return $smarty->display(dirname(__FILE__). '\AdminSlider.tpl');
         

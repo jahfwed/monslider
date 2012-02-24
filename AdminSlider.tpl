@@ -1,7 +1,18 @@
+<script type="text/javascript" src="../modules/monslider/js/jquery-ui-1.8.18.custom.min.js"></script>
 <script type="text/javascript" src="../modules/monslider/js/raphael.js"></script>
-<script type="text/javascript" src="jquery-1.6.1.min.js"></script>
+
 
 {literal}
+
+<script type="text/javascript">
+    $(function(){
+
+        // Tabs
+        $('#tabs').tabs();
+        $('#tabs').show();
+    });
+</script>
+
 <script type="text/javascript">
 // <![CDATA[
 window.onload = function() {
@@ -60,46 +71,59 @@ window.onload = function() {
 //]]>
 </script>
 {/literal}
-
-<form method="post" enctype="multipart/form-data" name="myForm">
-    <p>
-    <input type="file" name="fichier" />
-    <input type="submit" name="valider" id="valider" />
-    </p>
-    <p>
-        <input type="hidden" name="imgName" id="imgName" value="{$imageStart}" />
-        <input type="hidden" name="imageWidth" id="imageWidth" value="{$imageWidth}" />
-        <input type="hidden" name="imageHeight" id="imageHeight" value="{$imageHeight}" />
-        
-    </p>
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">Liste des photos</a></li>
+        <li><a href="#tabs-2">Ajouter une image</a></li>                
+    </ul>
     
-</form>
-<div id="recap">
-    <table border="1">
-        <tr>
-            <td>Position</td>
-            <td>Titre</td>
-            <td>Photo</td>
-            <td>Publier</td>
-        </tr>
-    </table>
-</div>
-<div id="divPhoto" style="background-color:#777;">
-    <form method="post" >
-        <p>
-            <input type="hidden" name="x" id="x" />
-            <input type="hidden" name="y" id="y" />
-            <input type="hidden" name="w" id="w" />
-            <input type="hidden" name="h" id="h" />
-        </p>
+    <div id="tabs-1">        
+        {foreach item=line from=$imgList}
+            <div>
+                <img src="../modules/monslider/crop/{$line.id}.{$line.extension}" alt="{l s='Slider' mod='slider'}" />
+                <img src="../modules/monslider/thumbs/{$line.id}.{$line.extension}" alt="{l s='Slider' mod='slider'}" />
+                <div>{$line.titre}</div>
+            </div>
+        {/foreach}
+    </div>
+    
+    <div id="tabs-2">        
+        <form method="post" enctype="multipart/form-data" name="myForm">
+            <p>
+                <label for="fichier">Choisissez une image : </label>
+                <input type="file" name="fichier" />
+                <input type="submit" name="valider" id="valider" />
+            </p>
+            <p>
+                <input type="hidden" name="imgName" id="imgName" value="{$imageStart}" />
+                <input type="hidden" name="imageWidth" id="imageWidth" value="{$imageWidth}" />
+                <input type="hidden" name="imageHeight" id="imageHeight" value="{$imageHeight}" />        
+            </p>        
+        </form>
         
-        <div id="divCrop">
-            <input type="text" name="titre" id="titre" value="titre" />
-            <input type="submit" name="validCrop" id="validCrop" value="valider le crop" />
-            <input type="hidden" name="extension" id="extension" value="{$extension}" />                    
+        <div id="divPhoto" style="background-color:#777;">
+            <form method="post" >
+                <p>
+                    <input type="hidden" name="x" id="x" />
+                    <input type="hidden" name="y" id="y" />
+                    <input type="hidden" name="w" id="w" />
+                    <input type="hidden" name="h" id="h" />
+                </p>
+                
+                <div id="divCrop">
+                    <input type="text" name="titre" id="titre" value="titre" />
+                    <input type="submit" name="validCrop" id="validCrop" value="valider le crop" />
+                    <input type="hidden" name="extension" id="extension" value="{$extension}" />                    
+                </div>
+            </form>   
         </div>
-    </form>   
+        
+    </div>
+            
 </div>
+
+
+
 
 
 
