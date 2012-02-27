@@ -1,0 +1,12 @@
+.thumbView{
+	/*float:left;*/
+	width:300px;
+	border:1px solid #555;
+	padding:2px;
+	margin:5px;
+	background-color:#ddd;
+}
+.thumbView p{
+	border:none;
+	padding:2px;
+}

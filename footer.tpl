@@ -1,8 +1,8 @@
 <script type="text/javascript" src="{$JsPath}/jquery.advancedSlider.js"></script>
 <!--[if IE]><script type="text/javascript" src="{$JsPath}/excanvas.compiled.js"></script><![endif]-->
-
-<script type="text/javascript">
 {literal}
+<script type="text/javascript">
+
 	var slider;
 		
 	$(document).ready(function(){
@@ -27,5 +27,5 @@
 		   }
 		   });
 	});
-{/literal}
 </script>
+{/literal}

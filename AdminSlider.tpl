@@ -1,21 +1,26 @@
 <script type="text/javascript" src="../modules/monslider/js/jquery-ui-1.8.18.custom.min.js"></script>
-<script type="text/javascript" src="../modules/monslider/js/raphael.js"></script>
-
-
+<script type="text/javascript" src="../modules/monslider/js/raphael.js"></script> 
 {literal}
-
 <script type="text/javascript">
     $(function(){
-
         // Tabs
         $('#tabs').tabs();
         $('#tabs').show();
+                
+        /*
+         cookie: {
+                // store cookie for a day, without, it would be a session cookie
+                expires: 1
+        }*/
     });
-</script>
+{/literal}
 
-<script type="text/javascript">
+{if isset($smarty.post.valider)}
+    {if $imageWidth > $cropW || $imageHeight > $cropH}
+
+{literal}
 // <![CDATA[
-window.onload = function() {
+$(document).ready( function() {
     var imgW = document.getElementById('imageWidth').value;
     var imgH = document.getElementById('imageHeight').value;
     
@@ -47,8 +52,7 @@ window.onload = function() {
             nowX = Math.max(0, nowX);
             nowY = Math.max(0, nowY);
             cadre.attr({x: nowX, y: nowY });
-        }
-        
+        }        
         var Sx = -cadre.attr("x");
         var Sy = -cadre.attr("y");
         var imageCrop = paper2.image(newImage,Sx,Sy,imgW,imgH);
@@ -56,48 +60,66 @@ window.onload = function() {
         document.getElementById('x').value = cadre.attr("x");
         document.getElementById('y').value = cadre.attr("y");
         document.getElementById('w').value = cadre.attr("x") + cropW;
-        document.getElementById('h').value = cadre.attr("y") + cropH;        
-        
-        
+        document.getElementById('h').value = cadre.attr("y") + cropH;
     },
     up = function () {
         // restoring state
         cadre.attr({opacity: 0.6});        
     };
-    
     // rstart and rmove are the resize functions;
     cadre.drag(move, start, up);
-};
+});
 //]]>
-</script>
+
 {/literal}
+{else}
+{literal}
+// <![CDATA[
+$(document).ready( function() {
+    var imgW = document.getElementById('imageWidth').value;
+    var imgH = document.getElementById('imageHeight').value;
+    
+    var paper = new Raphael(document.getElementById('divCrop'), imgW, imgH);
+    var newImage = "../modules/monslider/images/" + document.getElementById('imgName').value;
+    var imageUp = paper.image(newImage,0,0, imgW, imgH);
+    
+    document.getElementById('x').value = 0;
+    document.getElementById('y').value = 0;
+    document.getElementById('w').value = imgW;
+    document.getElementById('h').value = imgH;
+});
+//]]>
+{/literal}
+    {/if}
+{/if}
+</script>
+
 <div id="tabs">
     <ul>
         <li><a href="#tabs-1">Liste des photos</a></li>
         <li><a href="#tabs-2">Ajouter une image</a></li>                
-    </ul>
+    </ul>    
     
     <div id="tabs-1">        
         {foreach item=line from=$imgList}
-            <div>
-                <img src="../modules/monslider/crop/{$line.id}.{$line.extension}" alt="{l s='Slider' mod='slider'}" />
-                <img src="../modules/monslider/thumbs/{$line.id}.{$line.extension}" alt="{l s='Slider' mod='slider'}" />
-                <div>{$line.titre}</div>
+            <div class="thumbView">
+                <img src="../modules/monslider/thumbs/{$line.id}.{$line.extension}" alt="Photo {$line.id} - " />
+                <p>{$line.id} - {$line.titre}</p>
             </div>
         {/foreach}
-    </div>
+    </div>    
     
     <div id="tabs-2">        
         <form method="post" enctype="multipart/form-data" name="myForm">
             <p>
                 <label for="fichier">Choisissez une image : </label>
                 <input type="file" name="fichier" />
-                <input type="submit" name="valider" id="valider" />
+                <input type="submit" name="valider" id="valider" value="OK" />
             </p>
             <p>
                 <input type="hidden" name="imgName" id="imgName" value="{$imageStart}" />
                 <input type="hidden" name="imageWidth" id="imageWidth" value="{$imageWidth}" />
-                <input type="hidden" name="imageHeight" id="imageHeight" value="{$imageHeight}" />        
+                <input type="hidden" name="imageHeight" id="imageHeight" value="{$imageHeight}" />
             </p>        
         </form>
         
@@ -110,14 +132,23 @@ window.onload = function() {
                     <input type="hidden" name="h" id="h" />
                 </p>
                 
-                <div id="divCrop">
-                    <input type="text" name="titre" id="titre" value="titre" />
-                    <input type="submit" name="validCrop" id="validCrop" value="valider le crop" />
-                    <input type="hidden" name="extension" id="extension" value="{$extension}" />                    
-                </div>
+             <script type="text/javascript">
+             {if isset($smarty.post.valider)}                
+             </script>
+                       
+                 <div id="divCrop">
+                 <fieldset>
+                     <legend>Choisissez un titre</legend>
+                     <input type="text" name="titre" id="titre" value="titre" />
+                     <input type="submit" name="validCrop" id="validCrop" value="valider le crop" />
+                     <input type="hidden" name="extension" id="extension" value="{$extension}" />
+                 </fieldset>
+                 </div>
+             <script type="text/javascript">
+             {/if}
+             </script>
             </form>   
         </div>
-        
     </div>
             
 </div>

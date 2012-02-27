@@ -25,23 +25,21 @@ class AdminSlider extends AdminTab
 	public function display()
 	{
     	global $smarty;    	
-    	echo $this->l('Bienvenue sur votre Home Slider').'<br /><p class="center"><img src="'.Configuration::get('MOD_SLIDER_IMG').'" alt="-" /></p>';
+    	//echo $this->l('Welcome on your Home Slider').'<br /><p class="center"><img src="'.Configuration::get('MOD_SLIDER_IMG').'" alt="-" /></p>';
 		
 		$monslider = new monslider;        
         $result = $monslider->showPicture();
 
-        $smarty->assign('imageStart', $result['img']);
-        $smarty->assign('imageWidth', $result['size_x']);
-        $smarty->assign('imageHeight', $result['size_y']);
-        $smarty->assign('extension', $result['extension']);
+        $smarty->assign('imageStart',   $result['img']);
+        $smarty->assign('imageWidth',   $result['size_x']);
+        $smarty->assign('imageHeight',  $result['size_y']);
+        $smarty->assign('extension',    $result['extension']);
         
         //Configuration::updateValue('cropW', Tools::getValue(500));
         //Configuration::updateValue('cropH', Tools::getValue(350));
         
         $smarty->assign('cropW', 500);
         $smarty->assign('cropH', 350);
-        
-        //$monslider->deleteFiles('../modules/monslider/images/');
         
         $monslider->crop();
         $retour = $monslider->afficheImage();

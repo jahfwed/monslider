@@ -25,7 +25,7 @@ class monslider extends Module{
         || !$this->registerHook('header')
         || !$this->registerHook('footer')
 	    || !$this->registerHook('backOfficeHeader')
-	    || !Configuration::updateValue('MOD_SLIDER_IMG', _PS_MODULE_DIR_.'monslider/logo_admin.png')
+	    || !Configuration::updateValue('MOD_SLIDER_IMG', '../modules/monslider/logo_admin.png')
 		|| !$this->installModuleTab('AdminSlider', array(1=>'My Slider Tab', 2=>'Mon onglet Slider'), 2)
 		//Suppression des dossiers images et thumbnails
 		|| !mkdir('../modules/monslider/images')//if not exist??
@@ -115,7 +115,7 @@ class monslider extends Module{
     {
         global $smarty;
         
-        $sql = "SELECT id,extension FROM `ps_slider`";
+        $sql = "SELECT id,extension,titre FROM `ps_slider`";
         $result = Db::getInstance()->ExecuteS($sql);
         $smarty->assign('resultat', $result) ;
         $chemin = 'modules/monslider/';
@@ -144,6 +144,8 @@ class monslider extends Module{
     public function hookBackOfficeHeader($params)
     {
         echo "<link type='text/css' href='../modules/monslider/css/ui-darkness/jquery-ui-1.8.18.custom.css' rel='stylesheet' />";
+        //echo "<link type='text/css' href='../modules/monslider/css/south-street/jquery-ui-1.8.18.custom.css' rel='stylesheet' />";
+        echo "<link type='text/css' href='../modules/monslider/css/admin-slider.css' rel='stylesheet' />";
     }
     
     private function installModuleTab($tabClass, $tabName, $idTabParent)
@@ -218,103 +220,31 @@ class monslider extends Module{
                         
                         move_uploaded_file($_FILES['fichier']['tmp_name'], IMG_PATH . $fichierFinal);
                         
-                        $source   = imagecreatefromjpeg(IMG_PATH . $fichierFinal);
+                        switch ($extension) {
+                            case 'jpeg':
+                            case 'jpg':
+                                $source   = imagecreatefromjpeg(IMG_PATH . $fichierFinal);
+                                break;
+                            case 'png':
+                                $source   = imagecreatefrompng(IMG_PATH . $fichierFinal);                                
+                                break;
+                            case 'gif':
+                                $source   = imagecreatefromgif(IMG_PATH . $fichierFinal);                                
+                                break;
+                        }
                         $source_x = imagesx($source);
                         $source_y = imagesy($source);
                         
-                        return array( 'img'     =>$fichierFinal,
-                                      'size_x'  =>$source_x,
-                                      'size_y'  =>$source_y,
-                                      'extension' =>$extension
+                        return array( 'img'         =>$fichierFinal,
+                                      'size_x'      =>$source_x,
+                                      'size_y'      =>$source_y,
+                                      'extension'   =>$extension
                                     );
                     }
                 }
             }
         }
 	}
-	public function addPicture()
-    {
-        if(isset($_POST['valider'])){
-            if(isset($_FILES['fichier'])) {                    
-                $erreur = $_FILES['fichier']['error'];        
-                if ($erreur == 0) {
-                    $type = $_FILES['fichier']['type'];
-                    $type_img = strtolower(substr($type, 0,5));
-        
-                    if ($type_img == "image") {
-                        $tab = explode('/',$type);
-                        $extension = $tab[1];
-                        
-                        $sql="INSERT INTO `ps_slider` (`extension`) VALUES('$extension')";
-                        if(Db::getInstance()->Execute($sql)){
-                            $id = mysql_insert_id();
-                            $fichierFinal = $id .'.'. $extension;
-                            move_uploaded_file($_FILES['fichier']['tmp_name'], IMG_PATH . $fichierFinal);
-                            
-                            //Création de la vignette
-                            $source     = imagecreatefromjpeg(IMG_PATH . $fichierFinal);                            
-                            
-                            //On récupère les dimensions (pour garder toutes les proportions, paysage ou portrait)
-                            //$source_x = imagesx($source);
-                            //$source_y = imagesy($source);
-                            
-                            $thumb_x_final = 100;
-                            $thumb_y_final = 80;
-                            //$thumb_y_final = ($thumb_x_final * $source_y) / $source_x;
-                            
-                            $thumb      = imagecreatetruecolor($thumb_x_final,$thumb_y_final);
-                             
-                            //On récupère les dimensions
-                            $source_x = imagesx($source);
-                            $source_y = imagesy($source);
-                            $thumb_x  = imagesx($thumb);
-                            $thumb_y  = imagesy($thumb);
-                            $thumb_y_final = ($thumb_x * $source_y) / $source_x;
-                                                        
-                            imagecopyresampled($thumb,$source,0,0,0,0,$thumb_x,$thumb_y_final,$source_x,$source_y);
-                            
-                            imagejpeg($thumb,THUMB_PATH . $fichierFinal);
-                            
-                            
-                        }
-                        else {
-                            echo "fail";
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /*public function crop(){
-        if(isset($_POST['validCrop']))
-        {
-            $sql="SELECT id,extension FROM `ps_slider` ORDER BY id DESC";            
-            if($row = Db::getInstance()->getRow($sql)){                            
-                $id = $row['id'];
-                $extension = $row['extension'];
-                $fichierFinal = $id .'.'. $extension;
-            
-                $cropPos_x = $_POST['x'];
-                $cropPos_y = $_POST['y'];            
-                $srcCrop_x = $_POST['w'];
-                $srcCrop_y = $_POST['h'];
-                
-                $srcCrop = imagecreatefromjpeg(IMG_PATH . $fichierFinal);
-                $crop_x = 500;
-                $crop_y = 350;
-                $crop   = imagecreatetruecolor($crop_x,$crop_y); 
-                
-                imagecopy($crop,$srcCrop,0,0,$cropPos_x,$cropPos_y,$srcCrop_x,$srcCrop_y);
-                imagejpeg($crop,CROP_PATH . $fichierFinal);
-                
-                echo "<div class='divCropFinal'>";
-                echo "<img src='";
-                echo "../modules/monslider/crop/" . $fichierFinal;
-                echo " ' />";
-            }
-       }
-    }*/
    
    public function crop(){
         if(isset($_POST['validCrop'])){
@@ -327,53 +257,97 @@ class monslider extends Module{
                 $id = mysql_insert_id();    
                 
                 $fichierFinal = $id .'.'. $extension;
-            
+                
+                switch ($extension) {
+                            case 'jpeg':
+                            case 'jpg':
+                                $srcCrop   = imagecreatefromjpeg(IMG_PATH . $fichierFinal);
+                                break;
+                            case 'png':
+                                $srcCrop   = imagecreatefrompng(IMG_PATH . $fichierFinal);                                
+                                break;
+                            case 'gif':
+                                $srcCrop   = imagecreatefromgif(IMG_PATH . $fichierFinal);                                
+                                break;
+                }
+                                
                 $cropPos_x = $_POST['x'];
-                $cropPos_y = $_POST['y'];            
+                $cropPos_y = $_POST['y'];
                 $srcCrop_x = $_POST['w'];
                 $srcCrop_y = $_POST['h'];
                 
-                $srcCrop = imagecreatefromjpeg(IMG_PATH . $fichierFinal);
                 $crop_x = 500;
                 $crop_y = 350;
-                $crop   = imagecreatetruecolor($crop_x,$crop_y); 
-                
+                $crop   = imagecreatetruecolor($crop_x,$crop_y);
+            
                 imagecopy($crop,$srcCrop,0,0,$cropPos_x,$cropPos_y,$srcCrop_x,$srcCrop_y);
-                imagejpeg($crop,CROP_PATH . $fichierFinal);
+
+                switch ($extension) {
+                            case 'jpeg':
+                            case 'jpg':
+                                imagejpeg($crop,CROP_PATH . $fichierFinal);
+                                break;
+                            case 'png':
+                                imagepng($crop,CROP_PATH . $fichierFinal);                                
+                                break;
+                            case 'gif':
+                                imagegif($crop,CROP_PATH . $fichierFinal);                               
+                                break;
+                }
                 
                 //Création de la vignette
-                $source     = imagecreatefromjpeg(IMG_PATH . $fichierFinal);                            
+                switch ($extension) {
+                            case 'jpeg':
+                            case 'jpg':
+                                $source   = imagecreatefromjpeg(CROP_PATH . $fichierFinal);
+                                break;
+                            case 'png':
+                                $source   = imagecreatefrompng(CROP_PATH . $fichierFinal);                                
+                                break;
+                            case 'gif':
+                                $source   = imagecreatefromgif(CROP_PATH . $fichierFinal);                                
+                                break;
+                }                                            
                 
                 //On récupère les dimensions (pour garder toutes les proportions, paysage ou portrait)
                 //$source_x = imagesx($source);
                 //$source_y = imagesy($source);
                 
-                $thumb_x_final = 100;
-                $thumb_y_final = 80;
+                $thumb_x_final = 80;
+                $thumb_y_final = 50;
                 //$thumb_y_final = ($thumb_x_final * $source_y) / $source_x;
                 
                 $thumb      = imagecreatetruecolor($thumb_x_final,$thumb_y_final);
                  
                 //On récupère les dimensions
-                $source_x = imagesx($source);
-                $source_y = imagesy($source);
-                $thumb_x  = imagesx($thumb);
-                $thumb_y  = imagesy($thumb);
+                $source_x   = imagesx($source);
+                $source_y   = imagesy($source);
+                $thumb_x    = imagesx($thumb);
+                $thumb_y    = imagesy($thumb);
                 $thumb_y_final = ($thumb_x * $source_y) / $source_x;
                                             
                 imagecopyresampled($thumb,$source,0,0,0,0,$thumb_x,$thumb_y_final,$source_x,$source_y);
                 
-                imagejpeg($thumb,THUMB_PATH . $fichierFinal);
+                switch ($extension) {
+                            case 'jpeg':
+                            case 'jpg':
+                                imagejpeg($thumb,THUMB_PATH . $fichierFinal);
+                                break;
+                            case 'png':
+                                imagepng($thumb,THUMB_PATH . $fichierFinal);
+                                break;
+                            case 'gif':
+                                imagegif($thumb,THUMB_PATH . $fichierFinal);
+                                break;
                 }
-                
-                
+            }
         }
     }
                   
    
 
     public function afficheImage(){
-        $result = Db::getInstance()->ExecuteS('SELECT id, extension, titre FROM `ps_slider` ORDER BY id DESC');
+        $result = Db::getInstance()->ExecuteS('SELECT id, extension, titre, publish FROM `ps_slider` ORDER BY id DESC');
         if (!$result) 
             return false;
         return $result;   
