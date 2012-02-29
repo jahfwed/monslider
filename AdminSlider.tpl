@@ -1,17 +1,45 @@
 <script type="text/javascript" src="../modules/monslider/js/jquery-ui-1.8.18.custom.min.js"></script>
-<script type="text/javascript" src="../modules/monslider/js/raphael.js"></script> 
+<script type="text/javascript" src="../modules/monslider/js/jquery.ui.sortable.js"></script>
+<script type="text/javascript" src="../modules/monslider/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../modules/monslider/js/raphael.js"></script>
+<link type='text/css' href='../modules/monslider/css/ui-darkness/jquery-ui-1.8.18.custom.css' rel='stylesheet' />
+<!--<link type='text/css' href='../modules/monslider/css/south-street/jquery-ui-1.8.18.custom.css' rel='stylesheet' />-->
+<link rel="stylesheet" href="../modules/monslider/css/admin-slider.css" type="text/css">
+
 {literal}
 <script type="text/javascript">
     $(function(){
         // Tabs
-        $('#tabs').tabs();
-        $('#tabs').show();
-                
-        /*
-         cookie: {
+        $( "#tabs" ).tabs({
+            cookie: {
                 // store cookie for a day, without, it would be a session cookie
                 expires: 1
-        }*/
+            }
+        })
+        $('#tabs-1').sortable({ 
+            update: function() {
+                var order = $('#tabs-1').sortable('serialize');
+                alert(order);
+            }                                         
+        });
+        $( "#tabs-1" ).disableSelection();
+        
+        $('#tabs').show();
+        
+        {/literal}
+        {if isset($smarty.post.valider)}
+        {literal}
+            var selected = $( "#tabs" ).tabs( "option", "selected" );
+            $( "#tabs" ).tabs( "option", "selected", 1 );
+        {/literal}        
+        {/if}
+        {if isset($smarty.post.validCrop)}
+        {literal}
+            var selected = $( "#tabs" ).tabs( "option", "selected" );
+            $( "#tabs" ).tabs( "option", "selected", 0 );
+        {/literal}        
+        {/if}
+        {literal}
     });
 {/literal}
 
@@ -70,7 +98,6 @@ $(document).ready( function() {
     cadre.drag(move, start, up);
 });
 //]]>
-
 {/literal}
 {else}
 {literal}
@@ -100,19 +127,38 @@ $(document).ready( function() {
         <li><a href="#tabs-2">Ajouter une image</a></li>                
     </ul>    
     
+    <!-- //////// Tab 1 //////// -->
     <div id="tabs-1">        
         {foreach item=line from=$imgList}
-            <div class="thumbView">
-                <img src="../modules/monslider/thumbs/{$line.id}.{$line.extension}" alt="Photo {$line.id} - " />
-                <p>{$line.id} - {$line.titre}</p>
+            <div class="thumbView" id="img_{$line.id}">
+                <div>
+                    <img src="../modules/monslider/thumbs/{$line.id}.{$line.extension}" alt="Photo {$line.id} - " />                    
+                
+                    <form method="post">
+                        <p>
+                            <label for="publish" class="label">Online</label>
+                            <input type="checkbox" name="publish" id="publish" {if $line.publish == 1}checked="checked"{/if}/>
+                            <label for="deleteImage" class="label">Delete</label>
+                            <input type="checkbox" name="deleteImage" id="deleteImage" />
+                            <input type="hidden" name="publishCheck" id="publishCheck" value="{$line.publish}" />
+                            <input type="hidden" name="idCheck" id="idCheck" value="{$line.id}" />                            
+                            <input type="submit" name="validModif" id="validModif" value="confirm" class="confirmModif" />                    
+                        </p>
+                    </form>
+                </div>
+                <br clear="all"/>
+                <hr />
+                <p>{$line.titre}</p>
             </div>
         {/foreach}
-    </div>    
+    </div>
     
+    
+    <!-- //////// Tab 2 //////// -->
     <div id="tabs-2">        
         <form method="post" enctype="multipart/form-data" name="myForm">
             <p>
-                <label for="fichier">Choisissez une image : </label>
+                Choisissez une image :
                 <input type="file" name="fichier" />
                 <input type="submit" name="valider" id="valider" value="OK" />
             </p>
@@ -120,11 +166,11 @@ $(document).ready( function() {
                 <input type="hidden" name="imgName" id="imgName" value="{$imageStart}" />
                 <input type="hidden" name="imageWidth" id="imageWidth" value="{$imageWidth}" />
                 <input type="hidden" name="imageHeight" id="imageHeight" value="{$imageHeight}" />
-            </p>        
+            </p>
         </form>
         
-        <div id="divPhoto" style="background-color:#777;">
-            <form method="post" >
+        <div id="divPhoto">
+            <form method="post" name="cropForm" >
                 <p>
                     <input type="hidden" name="x" id="x" />
                     <input type="hidden" name="y" id="y" />
@@ -138,9 +184,11 @@ $(document).ready( function() {
                        
                  <div id="divCrop">
                  <fieldset>
-                     <legend>Choisissez un titre</legend>
-                     <input type="text" name="titre" id="titre" value="titre" />
-                     <input type="submit" name="validCrop" id="validCrop" value="valider le crop" />
+                     <legend>Donnez une légende (60 carac. max.)</legend>
+                     <input type="text" name="titre" id="titre" size="38" class="imgTitle" /><br />
+                     <label for="publishStart" class="label">Display online (yes by default)</label>
+                     <input type="checkbox" name="publishStart" id="publishStart" checked />
+                     <input type="submit" name="validCrop" id="validCrop" value="Confirm" />
                      <input type="hidden" name="extension" id="extension" value="{$extension}" />
                  </fieldset>
                  </div>

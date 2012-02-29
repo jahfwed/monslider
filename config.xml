@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
 	<name>monslider</name>
-	<displayName><![CDATA[HomeSlider Module]]></displayName>
+	<displayName><![CDATA[HomeSlider Gallery Module]]></displayName>
 	<version><![CDATA[1.0]]></version>
-	<description><![CDATA[Nice JQuery Slider]]></description>
+	<description><![CDATA[Nice JQuery Gallery Slider]]></description>
 	<author><![CDATA[]]></author>
 	<tab><![CDATA[Modules]]></tab>
 	<confirmUninstall>Are you sure you want to delete your details ?</confirmUninstall>

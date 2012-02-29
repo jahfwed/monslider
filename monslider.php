@@ -13,23 +13,24 @@ class monslider extends Module{
 	 
 	  parent::__construct();
 	 
-	  $this->displayName = $this->l('HomeSlider Module');
-	  $this->description = $this->l('Nice JQuery Slider');
+	  $this->displayName = $this->l('HomeSlider Gallery Module');
+	  $this->description = $this->l('Nice JQuery Gallery Slider');
 	  $this->confirmUninstall = $this->l('Are you sure you want to delete your details ?');
 	}
 	
 	public function install()
 	{
 	  if(!parent::install()
+        || !$this->setDefaults()
 	    || !$this->registerHook('home')
         || !$this->registerHook('header')
         || !$this->registerHook('footer')
 	    || !$this->registerHook('backOfficeHeader')
 	    || !Configuration::updateValue('MOD_SLIDER_IMG', '../modules/monslider/logo_admin.png')
-		|| !$this->installModuleTab('AdminSlider', array(1=>'My Slider Tab', 2=>'Mon onglet Slider'), 2)
+		|| !$this->installModuleTab('AdminSlider', array(1=>'My Photo Gallery Slider', 2=>'Ma Galerie Photo'), 2)
 		//Suppression des dossiers images et thumbnails
-		|| !mkdir('../modules/monslider/images')//if not exist??
-		|| !chmod('../modules/monslider/images',0777)
+		//|| !mkdir('../modules/monslider/images')//if not exist??
+		//|| !chmod('../modules/monslider/images',0777)
         //|| !mkdir('../modules/monslider/thumbs')
         //|| !mkdir('../modules/monslider/crop')
         /*Appel de la fonction de création de la table :*/
@@ -45,8 +46,7 @@ class monslider extends Module{
 	    || !Configuration::deleteByName('MOD_SLIDER_IMG')
 	    || !$this->uninstallModuleTab('AdminSlider')
 		//Suppression des dossiers images et thumbnails
-		//|| !Tools::deleteDirectory('../modules/monslider/images/')
-        || !$this->deleteFiles('../modules/monslider/images/')
+		|| !$this->deleteFiles('../modules/monslider/images/')
 		//|| !unlink('../modules/monslider/images')
         //|| !unlink('../modules/monslider/thumbs')
         //|| !unlink('../modules/monslider/crop')
@@ -56,6 +56,27 @@ class monslider extends Module{
 	    return false;
 	  return true;
 	}
+    
+    public function setDefaults() {
+        $defaults = array(      
+            'CROPW' => '500',
+            'CROPH' => '350'
+        );
+        $retval = TRUE;
+        foreach ($defaults as $k => $v) $retval = $this->_set($k, $v) && $retval;
+        return $retval;
+    }
+    protected function _set($varname, $value) {
+        return Configuration::updateValue(strtoupper($this->name).'_'.$varname, $value);
+    }
+    
+    protected function _unset($varname) {
+        return Configuration::deleteByName(strtoupper($this->name).'_'.$varname);
+    }
+    
+    public function _get($varname) {
+        return Configuration::get(strtoupper($this->name).'_'.$varname);
+    }
     
     //marche pas...à voir!
     public function deleteFiles($folder){
@@ -95,11 +116,12 @@ class monslider extends Module{
 	  $html .= '<h2>'.$this->l('Slider Module Configuration').'</h2>
 	  <form action="'.$_SERVER['REQUEST_URI'].'" method="post">
 	    <fieldset>
-	      <legend>'.$this->l('Settings').'</legend>
+	      <legend>'.$this->l('Gallery Settings').'</legend>
+	      <h4>Defines the gallery dimensions</h4>
 	      <div class="margin-form">
-            <label for="cropW">Choose Width :</label>	      
-	        <input type="text" name="newCropW" value="'.$cropW.'" /><br />
-	        <label for="cropH">Choose Height :</label>
+	        <label for="cropW">Set Gallery width : </label>	      
+	        <input type="text" name="newCropW" value="'.$cropW.'" /><br /><br />
+	        <label for="cropH">Set Gallery height : </label>
 	        <input type="text" name="newCropH" value="'.$cropH.'" />
 	      </div>
 	      <div class="clear center">
@@ -115,7 +137,7 @@ class monslider extends Module{
     {
         global $smarty;
         
-        $sql = "SELECT id,extension,titre FROM `ps_slider`";
+        $sql = "SELECT id,extension,titre FROM `ps_slider` WHERE publish = 1";
         $result = Db::getInstance()->ExecuteS($sql);
         $smarty->assign('resultat', $result) ;
         $chemin = 'modules/monslider/';
@@ -143,9 +165,9 @@ class monslider extends Module{
     }
     public function hookBackOfficeHeader($params)
     {
-        echo "<link type='text/css' href='../modules/monslider/css/ui-darkness/jquery-ui-1.8.18.custom.css' rel='stylesheet' />";
+        //echo "<link type='text/css' href='../modules/monslider/css/ui-darkness/jquery-ui-1.8.18.custom.css' rel='stylesheet' />";
         //echo "<link type='text/css' href='../modules/monslider/css/south-street/jquery-ui-1.8.18.custom.css' rel='stylesheet' />";
-        echo "<link type='text/css' href='../modules/monslider/css/admin-slider.css' rel='stylesheet' />";
+        //echo "<link type='text/css' href='../modules/monslider/css/admin-slider.css' rel='stylesheet' />";
     }
     
     private function installModuleTab($tabClass, $tabName, $idTabParent)
@@ -209,15 +231,14 @@ class monslider extends Module{
                         $tab = explode('/',$type);
                         $extension = $tab[1];
                         
-                        $sql="SELECT id FROM `ps_slider` ORDER BY id DESC";            
+                        $sql="SELECT * FROM `ps_slider` ORDER BY id DESC";            
                         if(!$row = Db::getInstance()->getRow($sql)){                        
                             $id = 1;                                
                         }
                         else{
                             $id = $row['id'] + 1;
                         }
-                        $fichierFinal = $id .'.'. $extension;
-                        
+                        $fichierFinal = $id .'.'. $extension;                        
                         move_uploaded_file($_FILES['fichier']['tmp_name'], IMG_PATH . $fichierFinal);
                         
                         switch ($extension) {
@@ -238,8 +259,11 @@ class monslider extends Module{
                         return array( 'img'         =>$fichierFinal,
                                       'size_x'      =>$source_x,
                                       'size_y'      =>$source_y,
-                                      'extension'   =>$extension
-                                    );
+                                      'extension'   =>$extension,
+                                      'id'          =>$id,
+                                      'publish'     =>$row['publish'],
+                                      'titre'       =>$row['titre']
+                        );
                     }
                 }
             }
@@ -250,9 +274,10 @@ class monslider extends Module{
         if(isset($_POST['validCrop'])){
                         
             $extension = $_POST['extension'];
-            $titre = $_POST['titre'];    
-                
-            $sql="INSERT INTO `ps_slider` (`extension`,`titre`) VALUES('$extension','$titre')";
+            $titre = $_POST['titre'];
+            if(isset($_POST['publishStart'])) $publishStart = 1; else $publishStart = 0;
+            
+            $sql="INSERT INTO `ps_slider` (`extension`,`titre`,`publish`) VALUES('$extension','$titre','$publishStart')";
             if(Db::getInstance()->Execute($sql)){
                 $id = mysql_insert_id();    
                 
@@ -269,18 +294,26 @@ class monslider extends Module{
                             case 'gif':
                                 $srcCrop   = imagecreatefromgif(IMG_PATH . $fichierFinal);                                
                                 break;
-                }
-                                
+                }                                
                 $cropPos_x = $_POST['x'];
                 $cropPos_y = $_POST['y'];
-                $srcCrop_x = $_POST['w'];
-                $srcCrop_y = $_POST['h'];
+                $srcCrop_w = $_POST['w'];
+                $srcCrop_h = $_POST['h'];
                 
-                $crop_x = 500;
-                $crop_y = 350;
-                $crop   = imagecreatetruecolor($crop_x,$crop_y);
-            
-                imagecopy($crop,$srcCrop,0,0,$cropPos_x,$cropPos_y,$srcCrop_x,$srcCrop_y);
+                $cropW = $this->_get('CROPW');
+                $cropH = $this->_get('CROPH');
+                
+                if($srcCrop_w < $cropW && $srcCrop_h < $cropH){
+                    $crop_x = $srcCrop_w;
+                    $crop_y = $srcCrop_h;
+                }
+                else{
+                    $crop_x = $cropW;
+                    $crop_y = $cropH;
+                }
+                $crop = imagecreatetruecolor($crop_x,$crop_y);
+                
+                imagecopy($crop,$srcCrop,0,0,$cropPos_x,$cropPos_y,$srcCrop_w,$srcCrop_h);
 
                 switch ($extension) {
                             case 'jpeg':
@@ -307,11 +340,7 @@ class monslider extends Module{
                             case 'gif':
                                 $source   = imagecreatefromgif(CROP_PATH . $fichierFinal);                                
                                 break;
-                }                                            
-                
-                //On récupère les dimensions (pour garder toutes les proportions, paysage ou portrait)
-                //$source_x = imagesx($source);
-                //$source_y = imagesy($source);
+                }
                 
                 $thumb_x_final = 80;
                 $thumb_y_final = 50;
@@ -343,17 +372,39 @@ class monslider extends Module{
             }
         }
     }
-                  
-   
 
     public function afficheImage(){
         $result = Db::getInstance()->ExecuteS('SELECT id, extension, titre, publish FROM `ps_slider` ORDER BY id DESC');
         if (!$result) 
             return false;
-        return $result;   
+        return $result;
     }
-     
-	
+    
+    public function showHide(){
+        if(isset($_POST['validModif'])){
+            if(isset($_POST['publish'])) $publish = 1; else $publish = 0;
+            $id = $_POST['idCheck'];
+            
+            $resultPublish = Db::getInstance()->Execute("UPDATE `ps_slider` SET publish= '$publish' WHERE id= '$id' ");
+            
+            if (!$resultPublish)
+                return false;
+            
+            //return $resultPublish;
+        }   
+    }
+    
+    public function deleteImage(){
+        if(isset($_POST['validModif'])){
+            if(isset($_POST['publish'])){
+                $id = $_POST['idCheck'];
+                $resultDelete = Db::getInstance()->Execute("DELETE FROM `ps_slider` WHERE id = '$id' ");
+                if (!$resultDelete) 
+                    return false;
+                //return $resultDelete;
+            }
+        }   
+    }
 	
 }
 

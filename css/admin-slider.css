@@ -1,12 +1,64 @@
+hr{
+	margin:4px 0;
+	background-color:#888;
+}
 .thumbView{
-	/*float:left;*/
-	width:300px;
-	border:1px solid #555;
-	padding:2px;
-	margin:5px;
+	float:left;
+	width:160px;
+	height:105px;
+	padding:4px;
+	margin:3px;
 	background-color:#ddd;
+	color:#000;
+    border:solid 1px #fff;
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+}
+.thumbView div{
+	margin:2px;
+	float:left;
 }
 .thumbView p{
-	border:none;
+	margin:0;
 	padding:2px;
 }
+.thumbView img{
+	margin:2px 10px 2px 2px;
+	float:left;
+}
+.label {
+    float:none;
+    font-weight: normal;
+    padding: 0.2em 0.5em 0 0;
+    text-align: right;
+}
+#tabs-2 form p{
+	text-align:center;
+	font-weight:bold;
+}
+
+#divCrop fieldset{
+	float: right;
+	margin: 30px 40px 0 0;
+	color:#000;
+	font-size: 1em;
+	text-align:left;
+}
+.confirmModif{
+	border:0;
+	margin-top:3px;
+	font-variant:small-caps;
+}
+.confirmModif:hover{
+	color:white;
+	background-color:black;
+}
+.ui-widget button {
+    font-family: Segoe UI,Arial,sans-serif;
+    font-size: 0.7em;
+}
+.imgTitle{
+	margin-bottom:10px;
+}
+
