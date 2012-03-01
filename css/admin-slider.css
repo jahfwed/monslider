@@ -62,3 +62,30 @@ hr{
 	margin-bottom:10px;
 }
 
+/*///////Thumbs buttons///////*/
+
+.thumbView a{
+	cursor:pointer;
+	text-decoration:none;
+	margin:5px 0 0 0;	
+}
+.toggle-online{
+	width:24px;
+	height:24px;
+	background:url('showhide.png') no-repeat bottom center;
+	float:left;
+}
+.toggled{
+	background-position:top center !important;
+}
+.delete{
+	width:24px;
+	height:24px;
+	margin:0 0 0 0px;
+	background:url('delete.png') no-repeat bottom center;
+	float:left;
+}
+.delete-ok{
+	background-position:top center;
+}
+	

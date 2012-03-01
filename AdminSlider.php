@@ -12,13 +12,13 @@ class AdminSlider extends AdminTab
 	  global $cookie, $_LANGADM;
 	  $langFile = _PS_MODULE_DIR_.$this->module.'/'.Language::getIsoById(intval($cookie->id_lang)).'.php';
 	  
-	  /*if(file_exists($langFile))
+	  if(file_exists($langFile))
 	  {
 	    require_once $langFile;
 	    foreach($_MODULE as $key=>$value)
 	      if(substr(strip_tags($key), 0, 5) == 'Admin')
 	        $_LANGADM[str_replace('_', '', strip_tags($key))] = $value;
-	  }*/
+	  }
 	  parent::__construct();
 	}
     
@@ -31,7 +31,7 @@ class AdminSlider extends AdminTab
 		$monslider = new monslider;        
         $result = $monslider->showPicture();
         
-        $monslider->showHide();
+        
         $monslider->deleteImage();
         
         $smarty->assign('imageStart',   $result['img']);
@@ -41,11 +41,8 @@ class AdminSlider extends AdminTab
         $smarty->assign('extension',    $result['extension']);
         $smarty->assign('publish',      $result['publish']);
         
-        //Configuration::updateValue('cropW', Tools::getValue(500));
-        //Configuration::updateValue('cropH', Tools::getValue(350));
-        
-        $smarty->assign('cropW', 500);
-        $smarty->assign('cropH', 350);
+        $smarty->assign('cropW', $monslider->_get('CROPW'));
+        $smarty->assign('cropH', $monslider->_get('CROPH'));
         
         $monslider->crop();
         

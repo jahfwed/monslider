@@ -28,7 +28,7 @@ class monslider extends Module{
 	    || !$this->registerHook('backOfficeHeader')
 	    || !Configuration::updateValue('MOD_SLIDER_IMG', '../modules/monslider/logo_admin.png')
 		|| !$this->installModuleTab('AdminSlider', array(1=>'My Photo Gallery Slider', 2=>'Ma Galerie Photo'), 2)
-		//Suppression des dossiers images et thumbnails
+		//Création des dossiers images et thumbnails
 		//|| !mkdir('../modules/monslider/images')//if not exist??
 		//|| !chmod('../modules/monslider/images',0777)
         //|| !mkdir('../modules/monslider/thumbs')
@@ -100,9 +100,8 @@ class monslider extends Module{
 	  {
 	    if(Validate::isInt(Tools::getValue('cropW') && Validate::isInt(Tools::getValue('cropW'))))
 	    {
-    	    Configuration::updateValue('cropW', Tools::getValue('newCropW'));
-            Configuration::updateValue('cropH', Tools::getValue('newCropH'));    
-              
+    	    $this->_set('CROPW', Tools::getValue('newCropW'));
+            $this->_set('CROPH', Tools::getValue('newCropH')); 
           
             $html .= $this->displayConfirmation($this->l('Settings updated.'));
 	    }
@@ -111,17 +110,17 @@ class monslider extends Module{
 	      $html .= $this->displayError($this->l('Invalid Value.'));
 	    }
 	  }
-	  $cropW = Configuration::get('cropW');
-      $cropH = Configuration::get('cropH');
+	  $cropW = $this->_get('CROPW');
+      $cropH = $this->_get('CROPH');
 	  $html .= '<h2>'.$this->l('Slider Module Configuration').'</h2>
 	  <form action="'.$_SERVER['REQUEST_URI'].'" method="post">
 	    <fieldset>
 	      <legend>'.$this->l('Gallery Settings').'</legend>
-	      <h4>Defines the gallery dimensions</h4>
+	      <h4>'.$this->l('Defines the gallery dimensions').'</h4>
 	      <div class="margin-form">
-	        <label for="cropW">Set Gallery width : </label>	      
+	        <label for="cropW">'.$this->l('Set Gallery width').' : </label>	      
 	        <input type="text" name="newCropW" value="'.$cropW.'" /><br /><br />
-	        <label for="cropH">Set Gallery height : </label>
+	        <label for="cropH">'.$this->l('Set Gallery height').' : </label>
 	        <input type="text" name="newCropH" value="'.$cropH.'" />
 	      </div>
 	      <div class="clear center">
@@ -204,6 +203,7 @@ class monslider extends Module{
           `extension` varchar(5) NOT NULL,
           `titre` varchar(100) NOT NULL,
           `publish` tinyint(1) NOT NULL,
+          `order` int(11) NOT NULL,
           PRIMARY KEY (`id`)
         ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1'
         ))        
@@ -374,37 +374,52 @@ class monslider extends Module{
     }
 
     public function afficheImage(){
-        $result = Db::getInstance()->ExecuteS('SELECT id, extension, titre, publish FROM `ps_slider` ORDER BY id DESC');
+        $result = Db::getInstance()->ExecuteS('SELECT id, extension, titre, publish FROM `ps_slider` ORDER BY picsOrder ASC');
         if (!$result) 
             return false;
         return $result;
     }
     
     public function showHide(){
-        if(isset($_POST['validModif'])){
-            if(isset($_POST['publish'])) $publish = 1; else $publish = 0;
-            $id = $_POST['idCheck'];
+            $toggle = $_POST['toggle'];
+            $id     = $_POST['id'];
             
-            $resultPublish = Db::getInstance()->Execute("UPDATE `ps_slider` SET publish= '$publish' WHERE id= '$id' ");
+            if ($toggle == 1)
+                $toggle = 0;
+            else 
+                $toggle = 1;
+            
+            $resultPublish = Db::getInstance()->Execute("UPDATE `ps_slider` SET publish= '$toggle' WHERE id= '$id' ");
             
             if (!$resultPublish)
-                return false;
-            
-            //return $resultPublish;
-        }   
+                return false;  
     }
     
     public function deleteImage(){
-        if(isset($_POST['validModif'])){
-            if(isset($_POST['publish'])){
-                $id = $_POST['idCheck'];
-                $resultDelete = Db::getInstance()->Execute("DELETE FROM `ps_slider` WHERE id = '$id' ");
-                if (!$resultDelete) 
-                    return false;
-                //return $resultDelete;
-            }
-        }   
+        if(isset($_POST['validDelete'])){
+            $id     = $_POST['id'];
+            
+            $resultDelete = Db::getInstance()->Execute("DELETE FROM `ps_slider` WHERE id = '$id' ");
+            if (!$resultDelete) 
+                return false;
+        }
     }
+    
+    public function sortImage(){
+        $img = $_POST['img'];
+        $ok  = true;
+        for ($i = 0; $i < count($img); $i++) {
+                
+            $sql="UPDATE `ps_slider` SET `picsOrder`=" . $i . " WHERE `id`='" . $img[$i] . "'";
+            if(!Db::getInstance()->Execute($sql))
+                $ok = false;
+        }
+        
+        if ($ok)
+            echo $this->l('Position updated.');
+        else 
+            echo $this->l('Position could not be updated.');
+            }
 	
 }
 
