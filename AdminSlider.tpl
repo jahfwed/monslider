@@ -60,14 +60,15 @@
         
         $('.delete').click(function(event) {
             event.preventDefault();
-            var object  = $(this);
-            var id      = object.attr('data-id');
-            var x=window.confirm({/literal}{l s='Are you sure you want to delete this picture?' mod='monslider'}{literal})
+            var object      = $(this);
+            var id          = object.attr('data-id');
+            var extension   = object.attr('data-extension');
+            var x=window.confirm("{/literal}{l s='Are you sure you want to delete this picture?' mod='monslider'}{literal}")
             if (x){
                 $.ajax({
                     type: "POST",
                     url: "../modules/monslider/adminslider_ajax.php",
-                    data: 'validDelete=true&id='+id,
+                    data: 'validDelete=true&id='+id+'&extension='+extension,
                     async : true,
                     success: function(msg) {
                         object.parents('.thumbView').remove();
@@ -78,6 +79,13 @@
         
         
         {/literal}
+        /*{if !$imgList && !isset($smarty.post.valider)}
+        {literal}
+            var selected = $( "#tabs" ).tabs( "option", "selected" );
+            $( "#tabs" ).tabs( "option", "selected", 1 );
+        {/literal}
+        {/if}*/
+        
         {if isset($smarty.post.valider)}
         {literal}
             var selected = $( "#tabs" ).tabs( "option", "selected" );
@@ -88,7 +96,7 @@
         {literal}
             var selected = $( "#tabs" ).tabs( "option", "selected" );
             $( "#tabs" ).tabs( "option", "selected", 0 );
-        {/literal}        
+        {/literal}
         {/if}
         {literal}
     });
@@ -108,7 +116,7 @@ $(document).ready( function() {
     
     var paper = new Raphael(document.getElementById('divPhoto'), imgW, imgH);
         
-    var newImage = "../modules/monslider/images/" + document.getElementById('imgName').value;
+    var newImage = "../modules/monslider/pictures/images/" + document.getElementById('imgName').value;
     var imageUp = paper.image(newImage,0,0, imgW, imgH);
     
     var cadre = paper.rect(10,10,cropW,cropH).attr({fill:"#999", opacity:0.6, cursor:"move"});
@@ -158,7 +166,7 @@ $(document).ready( function() {
     var imgH = document.getElementById('imageHeight').value;
     
     var paper = new Raphael(document.getElementById('divCrop'), imgW, imgH);
-    var newImage = "../modules/monslider/images/" + document.getElementById('imgName').value;
+    var newImage = "../modules/monslider/pictures/images/" + document.getElementById('imgName').value;
     var imageUp = paper.image(newImage,0,0, imgW, imgH);
     
     document.getElementById('x').value = 0;
@@ -180,18 +188,20 @@ $(document).ready( function() {
     
     <!-- //////// Tab 1 //////// -->
     <div id="tabs-1">        
-        {foreach item=line from=$imgList}
-            <div class="thumbView" id="img_{$line.id}">
-                <div>
-                    <img src="../modules/monslider/thumbs/{$line.id}.{$line.extension}" alt="Photo {$line.id} - " />                    
-                    <a class="{if $line.publish == 0}toggled{/if} toggle-online" data-id="{$line.id}" data-toggle="{$line.publish}">&nbsp;</a>
-                    <a class="delete" data-id="{$line.id}">&nbsp;</a>
+        {if $imgList}
+            {foreach item=line from=$imgList}
+                <div class="thumbView" id="img_{$line.id}">
+                    <div>
+                        <img src="../modules/monslider/pictures/thumbs/{$line.id}.{$line.extension}" alt="Photo {$line.id} - " />                    
+                        <a class="{if $line.publish == 0}toggled{/if} toggle-online" data-id="{$line.id}" data-toggle="{$line.publish}" title="{l s='Show / Hide the picture in the gallery' mod='monslider'}">&nbsp;</a>
+                        <a class="delete" data-id="{$line.id}" data-extension="{$line.extension}" title="{l s='Delete the picture' mod='monslider'}">&nbsp;</a>
+                    </div>
+                    <br clear="all"/>
+                    <hr />
+                    <p>{$line.titre}</p>
                 </div>
-                <br clear="all"/>
-                <hr />
-                <p>{$line.titre}</p>
-            </div>
-        {/foreach}
+            {/foreach}
+        {/if}
     </div>
     
     

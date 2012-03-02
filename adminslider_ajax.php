@@ -4,13 +4,13 @@ include_once('monslider.php');
 
 $monslider = new monslider;
 
-if(isset($_POST['img']))
+if(Tools::getValue('img'))
     $monslider->sortImage();
 
-if(isset($_POST['validModif']))
+if(Tools::getValue('validModif'))
     $monslider->showHide();
 
-if(isset($_POST['validDelete']))
+if(Tools::getValue('validDelete'))
     $monslider->deleteImage();
 
 ?>
