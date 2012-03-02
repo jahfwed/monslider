@@ -26,7 +26,8 @@
                     data: order,
                     async : true,
                     success: function(msg) {
-                        alert(msg);
+                        $("#confNotif").fadeIn("slow");
+                        $("#confNotif").delay(1500).fadeOut("slow");
                     }
                 });        
             }                                         
@@ -54,6 +55,8 @@
                             object.removeClass('toggled');
                             object.attr('data-toggle', 1);
                         }
+                        $("#confNotif").fadeIn("slow");
+                        $("#confNotif").delay(1500).fadeOut("slow");
                     }
             });
         });
@@ -122,6 +125,11 @@ $(document).ready( function() {
     var cadre = paper.rect(10,10,cropW,cropH).attr({fill:"#999", opacity:0.6, cursor:"move"});
     var paper2 = new Raphael(document.getElementById('divCrop'), cropW,cropH);
     
+    document.getElementById('x').value = cadre.attr("x");
+    document.getElementById('y').value = cadre.attr("y");
+    document.getElementById('w').value = cadre.attr("x") + cropW;
+    document.getElementById('h').value = cadre.attr("y") + cropH;
+    
     var nowX, nowY,
     start = function() {
         // storing original coordinates
@@ -180,6 +188,10 @@ $(document).ready( function() {
 {/if}
 </script>
 
+<div class="conf confirm" id="confNotif" style="display:none;">
+    <img alt="Confirmation" src="../img/admin/ok.gif">
+    {l s='Position updated.' mod='monslider'}
+</div>
 <div id="tabs">
     <ul>
         <li><a href="#tabs-1">{l s='Pictures list' mod='monslider'}</a></li>
@@ -217,6 +229,7 @@ $(document).ready( function() {
                 <input type="hidden" name="imgName" id="imgName" value="{$imageStart}" />
                 <input type="hidden" name="imageWidth" id="imageWidth" value="{$imageWidth}" />
                 <input type="hidden" name="imageHeight" id="imageHeight" value="{$imageHeight}" />
+                
             </p>
         </form>
         
@@ -240,6 +253,7 @@ $(document).ready( function() {
                      <label for="publishStart" class="label">{l s='Display online (Yes by default)' mod='monslider'}</label>
                      <input type="checkbox" name="publishStart" id="publishStart" checked />
                      <input type="submit" name="validCrop" id="validCrop" value="{l s='Confirm' mod='monslider'}" />
+                     <input type="hidden" name="idImg" id="idImg" value="{$idImg}" />
                      <input type="hidden" name="extension" id="extension" value="{$extension}" />
                  </fieldset>
                  </div>

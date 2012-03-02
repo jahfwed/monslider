@@ -199,6 +199,7 @@ class monslider extends Module{
           `titre` varchar(100) NOT NULL,
           `publish` tinyint(1) NOT NULL,
           `picsOrder` int(11) NOT NULL,
+          `cropped` tinyint(1) NOT NULL,
           PRIMARY KEY (`id`)
         ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1'
         ))        
@@ -209,6 +210,18 @@ class monslider extends Module{
     private function deleteTable()
     {
        return Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'slider`;');        
+    }
+    
+    public function selectCropped(){
+        $sql='SELECT * FROM `'._DB_PREFIX_.'slider` ORDER BY id DESC';            
+        if($row = Db::getInstance()->getRow($sql)){
+             if ($row['cropped'] == 0)
+                return false;
+             else 
+                 return true;
+        }
+        else
+            return false;
     }
     
 	public function addPicture(){
@@ -223,13 +236,30 @@ class monslider extends Module{
                         $tab = explode('/',$type);
                         $extension = $tab[1];
                         
-                        $sql='SELECT * FROM `'._DB_PREFIX_.'slider` ORDER BY id DESC';            
-                        if(!$row = Db::getInstance()->getRow($sql)){                        
-                            $id = 1;                                
+                        
+                        if($this->selectCropped()){            
+                            $cropped = 0;
+                            $sql='INSERT INTO `'._DB_PREFIX_.'slider` (`extension`,`cropped`) VALUES ("'.$extension.'",'.$cropped.') ';            
+                            if($row = Db::getInstance()->Execute($sql)){                        
+                                $id = Db::getInstance()->Insert_ID();                                
+                            }
                         }
                         else{
-                            $id = $row['id'] + 1;
+                            $sql = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'slider` WHERE cropped=0 ORDER BY id DESC ');
+                            if ($sql){
+                                Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'slider` SET extension = "'.$extension.'" WHERE id= '.$sql['id'].' ');
+                                $id = $sql['id'];
+                            }
+                            else{
+                                $cropped = 0;
+                                $sql='INSERT INTO `'._DB_PREFIX_.'slider` (`extension`,`cropped`) VALUES ("'.$extension.'",'.$cropped.') ';            
+                                if($row = Db::getInstance()->Execute($sql)){                        
+                                    $id = Db::getInstance()->Insert_ID();                                
+                                }
+                            }
                         }
+                        
+                        
                         $fichierFinal = $id .'.'. $extension;                        
                         move_uploaded_file($_FILES['fichier']['tmp_name'], IMG_PATH . $fichierFinal);
                         
@@ -253,8 +283,8 @@ class monslider extends Module{
                                       'size_y'      =>$source_y,
                                       'extension'   =>$extension,
                                       'id'          =>$id,
-                                      'publish'     =>$row['publish'],
-                                      'titre'       =>$row['titre']
+                                      //'publish'     =>$row['publish'],
+                                      //'titre'       =>$row['titre']
                         );
                     }
                 }
@@ -267,11 +297,16 @@ class monslider extends Module{
                         
             $extension = Tools::getValue('extension');
             $titre = pSQL(Tools::getValue('titre'));
+            $cropped = 1;
             if(Tools::getValue('publishStart')) $publishStart = 1; else $publishStart = 0;
             
-            $sql='INSERT INTO `'._DB_PREFIX_.'slider` (`extension`,`titre`,`publish`) VALUES("'.$extension.'","'.$titre.'",'.$publishStart.')';
+            $id = Tools::getValue('idImg');
+            
+            $sql = 'UPDATE `'._DB_PREFIX_.'slider` SET titre= "'.$titre.'", cropped = '.$cropped.', publish = '.$publishStart.' WHERE id= '.$id.' ';
+            
+            
             if(Db::getInstance()->Execute($sql)){
-                $id = mysql_insert_id();    
+                //$id = mysql_insert_id();    
                 
                 $fichierFinal = $id .'.'. $extension;
                 
@@ -365,7 +400,7 @@ class monslider extends Module{
         }
     }
 
-    public function afficheImage(){
+    public function showImage(){
         $result = Db::getInstance()->ExecuteS('SELECT id, extension, titre, publish FROM `'._DB_PREFIX_.'slider` ORDER BY picsOrder ASC');
         if (!$result) 
             return false;

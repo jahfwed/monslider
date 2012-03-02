@@ -34,16 +34,16 @@ class AdminSlider extends AdminTab
         $smarty->assign('imageStart',   $result['img']);
         $smarty->assign('imageWidth',   $result['size_x']);
         $smarty->assign('imageHeight',  $result['size_y']);
-        $smarty->assign('id',           $result['id']);
+        $smarty->assign('idImg',        $result['id']);
         $smarty->assign('extension',    $result['extension']);
-        $smarty->assign('publish',      $result['publish']);
+        //$smarty->assign('publish',      $result['publish']);
         
         $smarty->assign('cropW', $monslider->_get('CROPW'));
         $smarty->assign('cropH', $monslider->_get('CROPH'));
         
         $monslider->crop();
         
-        $retour = $monslider->afficheImage();
+        $retour = $monslider->showImage();
         $smarty->assign('imgList', $retour);        
         
         return $smarty->display(dirname(__FILE__). '\AdminSlider.tpl');
